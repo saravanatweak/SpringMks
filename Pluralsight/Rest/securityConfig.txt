@@ -1,0 +1,29 @@
+package com.guitar.config;
+
+import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+
+@Configuration
+@EnableWebSecurity
+@EnableGlobalMethodSecurity(prePostEnabled = true)
+public class SecurityConfiguration extends WebSecurityConfigurerAdapter{
+	
+	 public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
+		 auth
+		 	.inMemoryAuthentication()// generally its not prepared to use try to use some standard library on the same
+		 	.withUser("test").password("test123").roles("USER")
+		 	.and()
+		 	.withUser("admin").password("admin").roles("USER","ADMIN");
+	 }
+	
+	  /*By adding Spring Security, Spring also enables CSRF, which stands for Cross Site Request Forgery. This requires the caller to send a CSRF token, which is usually stored as a hidden field on a web form. Since we aren't using web forms, but rather posting with a JSON payload, we need to disable CSRF for our application. We can do that by adding a method from WebSecurityConfigurerAdapter class. For a real application you should weigh the pros and cons of turning off CSRF, and if you do want it on you need to determine the best way to handle your CSRF token headers. */
+	 protected void configure(HttpSecurity httpSec) throws Exception {
+		 super.configure(httpSec);
+		 httpSec.csrf().disable();// allows us to turn off the CSRF so as we can continue to consume/post data to our REST API.
+	 }
+
+}
